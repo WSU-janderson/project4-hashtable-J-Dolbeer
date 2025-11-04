@@ -1,25 +1,24 @@
 #pragma once
+#include "HashTableBucket.h"
 #include <vector>
 #include <string>
-#include <memory>
 #include <optional>
-#include <iostream>
-#include "HashTableBucket.h"
+#include <memory>
+#include <ostream>
+#include <random>
 
 class HashTable {
-    private:
-    std::vector<std::weak_ptr<HashTableBucket>> tableData;
+private:
+    std::vector<std::weak_ptr<HashTableBucket>> table;
     std::vector<size_t> offsets;
-    size_t numElements;
-    size_t capacity_;
+    size_t numItems;
 
     void generateOffsets();
     size_t hash(const std::string& key) const;
-    void resize();
-    void rehashBackwards();
-    void debugDumpToJSON() const;
+    void resizeIfNeeded();
+    void rehashAll(const std::vector<std::shared_ptr<HashTableBucket>>& oldTable);
 
-    public:
+public:
     HashTable(size_t initCapacity = 8);
 
     bool insert(const std::string& key, const size_t& value);
@@ -27,11 +26,11 @@ class HashTable {
     bool contains(const std::string& key) const;
     std::optional<size_t> get(const std::string& key) const;
     size_t& operator[](const std::string& key);
-
     std::vector<std::string> keys() const;
     double alpha() const;
     size_t capacity() const;
     size_t size() const;
-
-    friend std::ostream& operator<<(std::ostream& os, const HashTable& hashTable);
+    void rehashBackwards();
+    
+    friend std::ostream& operator<<(std::ostream& os, const HashTable& ht);
 };
